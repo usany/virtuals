@@ -38,62 +38,74 @@ variable "compartment_id" {
 variable "vcn_cidr_block" {
   description = "The list of IPv4 CIDR blocks the VCN will use"
   type        = string
+  default     = "10.0.0.0/16"
 }
 
 variable "vcn_display_name" {
   description = "Descriptive name for the VCN"
   type        = string
+  default     = "terraform_vcn_example"
 }
 
 variable "vcn_dns_label" {
   description = "Descriptive alphanumeric name for the DNS"
   type        = string
+  default     = "terraformvcn"
 }
 
 variable "vcn_id" {
   description = "Existing VCN OCID if create_new_vcn = false"
   type        = string
+  default     = ""
 }
 
 variable "private_subnet_id" {
   description = "Existing private subnet OCID"
   type        = string
+  default     = ""
 }
 
 variable "public_subnet_id" {
   description = "Existing public subnet OCID"
   type        = string
+  default     = ""
 }
 
 # Subnet Variables
 variable "private_subnet_cidr_block" {
   description = "OCI private subnet CIDR block range"
   type        = string
+  default     = "10.0.1.0/24"
 }
 
 variable "private_subnet_display_name" {
   description = "Descriptive name for the private subnet"
   type        = string
+  default     = "terraform_private_subnet_example"
 }
 
 variable "private_subnet_prohibit_public_ip_on_vnic" {
   description = "Prohibit public IP address on the VNIC"
   type        = bool
+  default     = false
 }
 
 variable "public_subnet_cidr_block" {
   description = "OCI public subnet CIDR block range"
   type        = string
+  default     = "10.0.2.0/24"
 }
 
 variable "public_subnet_display_name" {
   description = "Descriptive name for the public subnet"
   type        = string
+  default     = "terraform_public_subnet_example"
 }
 
 variable "public_subnet_prohibit_public_ip_on_vnic" {
   description = "Prohibit public IP address on the VNIC"
   type        = bool
+  default     = false
 }
 
 # Compute Variables
