@@ -26,3 +26,9 @@ resource "vercel_deployment" "example" {
   path_prefix = "../nextjs-terraform-demo"
   production  = true
 }
+
+resource "vercel_project_domain" "example" {
+  project_id = vercel_project.example.id
+  domain     = "myproject-domain.vercel.app"
+}
+
