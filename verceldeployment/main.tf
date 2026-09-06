@@ -12,7 +12,7 @@ resource "vercel_project" "example" {
   framework = "nextjs"
   git_repository = {
     type = "github"
-    repo = "<username>/nextjs-terraform-demo"
+    repo = "usany/nextjs-terraform-demo"
   }
 }
 
