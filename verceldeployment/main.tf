@@ -15,3 +15,14 @@ resource "vercel_project" "example" {
     repo = "<username>/nextjs-terraform-demo"
   }
 }
+
+data "vercel_project_directory" "example" {
+  path = "../nextjs-terraform-demo"
+}
+
+resource "vercel_deployment" "example" {
+  project_id  = vercel_project.example.id
+  files       = data.vercel_project_directory.example.files
+  path_prefix = "../nextjs-terraform-demo"
+  production  = true
+}
