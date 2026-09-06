@@ -145,16 +145,6 @@ variable "create_linux_instance" {
   type        = bool
 }
 
-variable "create_windows_instance" {
-  description = "Boolean variable to specify whether to provision a Windows instance"
-  type        = bool
-}
-
-variable "windows_image_ocid" {
-  description = "OCID of the Windows image to use"
-  type        = string
-}
-
 variable "linux_image_ocid" {
   description = "OCID of the Linux image to use"
   type        = string
