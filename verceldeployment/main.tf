@@ -7,12 +7,16 @@ terraform {
   }
 }
 
+provider "vercel" {
+  api_token = var.vercel_api_token
+}
+
 resource "vercel_project" "example" {
   name      = "terraform-test-project"
   framework = "nextjs"
   git_repository = {
     type = "github"
-    repo = "usany/personal"
+    repo = "usany/soil"
   }
 }
 
