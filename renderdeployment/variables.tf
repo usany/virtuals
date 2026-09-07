@@ -33,7 +33,7 @@ variable "branch" {
 
 variable "region" {
   type        = string
-  description = "Render region for deployment (e.g., oregon, ohio)"
+  description = "Render region for deployment (e.g., oregon, ohio, singapore)"
   default     = "oregon"
 }
 
@@ -43,16 +43,16 @@ variable "plan" {
   default     = "free"
 }
 
-variable "build_command" {
+variable "runtime" {
   type        = string
-  description = "Build command for the project"
-  default     = "npm run build"
+  description = "Runtime environment (docker, node, python, ruby, etc.)"
+  default     = "docker"
 }
 
-variable "start_command" {
+variable "dockerfile_path" {
   type        = string
-  description = "Start command to run the application"
-  default     = "npm start"
+  description = "Path to Dockerfile (used when runtime is docker)"
+  default     = "./Dockerfile"
 }
 
 variable "environment_variables" {

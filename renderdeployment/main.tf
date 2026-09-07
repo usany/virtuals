@@ -21,21 +21,14 @@ resource "render_service" "main" {
   region         = var.region
   plan           = var.plan
   
-  build_command = var.build_command
-  start_command = var.start_command
+  # Docker configuration
+  runtime              = var.runtime
+  dockerfile_path      = var.dockerfile_path
   
   # Environment variables
-  environment_slug = "docker"
+  environment_variables = var.environment_variables
   
   depends_on = []
-}
-
-# Set environment variables for the service
-resource "render_env_group" "main" {
-  name       = "${var.service_name}-env"
-  service_id = render_service.main.id
-  
-  env_vars = var.environment_variables
 }
 
 # Set custom domain if provided
