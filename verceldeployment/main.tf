@@ -41,3 +41,15 @@ resource "vercel_project_domain" "main" {
   domain     = var.custom_domain
 }
 
+# Trigger production deployment
+resource "vercel_deployment" "main" {
+  project_id = vercel_project.main.id
+  environment = "production"
+  ref        = "main"  # Change to your main branch name if different
+  
+  depends_on = [
+    vercel_project.main,
+    vercel_project_environment_variable.main
+  ]
+}
+
