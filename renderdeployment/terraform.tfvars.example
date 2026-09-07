@@ -1,0 +1,44 @@
+# TEMPLATE: Copy this file to terraform.tfvars and fill in your actual values
+# DO NOT commit terraform.tfvars - it contains sensitive credentials
+
+# GitHub Personal Access Token
+# How to generate:
+#   1. Go to https://github.com/settings/tokens
+#   2. Click "Generate new token"
+#   3. Select these scopes:
+#      - repo (Full control of private repositories)
+#      - read:org (Read org and team membership)
+#   4. Copy the token
+github_token = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# Render API Key
+# How to generate:
+#   1. Go to https://dashboard.render.com/account/api-tokens
+#   2. Click "Create API Token"
+#   3. Copy the token
+render_api_key = "rnd_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# GitHub repository URL (HTTPS format)
+github_repo = "https://github.com/username/repo-name"
+
+# Render owner/account ID
+# Found in Render dashboard under account settings
+render_owner_id = "acc_xxxxxxxxxxxxxxxx"
+
+# Service configuration
+service_name = "my-app"
+branch       = "main"
+region       = "oregon"          # Options: oregon, ohio, singapore, virginia
+plan         = "free"            # Options: free, starter, standard, pro
+runtime      = "docker"          # Options: docker, node, python, ruby, go, rust
+
+# Dockerfile path (only used when runtime = "docker")
+dockerfile_path = "./Dockerfile"
+
+# Custom domain (optional)
+custom_domain = ""
+
+# Environment variables
+environment_variables = {
+  NODE_ENV = "production"
+}
