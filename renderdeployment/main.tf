@@ -46,7 +46,6 @@ resource "render_deployment" "main" {
   clear_cache = true
   
   depends_on = [
-    render_service.main,
-    render_env_group.main
+    render_service.main
   ]
 }
