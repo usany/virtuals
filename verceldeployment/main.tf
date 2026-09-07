@@ -25,6 +25,16 @@ resource "vercel_project" "main" {
   install_command  = var.install_command
 }
 
+# Set environment variables for production deployment
+resource "vercel_project_environment_variable" "main" {
+  for_each = var.environment_variables
+  
+  project_id = vercel_project.main.id
+  key        = each.key
+  value      = each.value
+  target     = ["production"]
+}
+
 resource "vercel_project_domain" "main" {
   count      = var.custom_domain != "" ? 1 : 0
   project_id = vercel_project.main.id
