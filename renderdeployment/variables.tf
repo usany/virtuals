@@ -4,20 +4,14 @@ variable "render_api_key" {
   sensitive   = true
 }
 
-variable "github_token" {
+variable "render_owner_id" {
   type        = string
-  description = "GitHub personal access token for repository access"
-  sensitive   = true
+  description = "Render owner/account ID"
 }
 
 variable "github_repo" {
   type        = string
   description = "GitHub repository URL (e.g., https://github.com/username/repo-name)"
-}
-
-variable "render_owner_id" {
-  type        = string
-  description = "Render account/team owner ID"
 }
 
 variable "service_name" {
@@ -45,13 +39,13 @@ variable "plan" {
 
 variable "runtime" {
   type        = string
-  description = "Runtime environment (docker, node, python, ruby, etc.)"
+  description = "Runtime environment (docker)"
   default     = "docker"
 }
 
 variable "dockerfile_path" {
   type        = string
-  description = "Path to Dockerfile (used when runtime is docker)"
+  description = "Path to Dockerfile"
   default     = "./Dockerfile"
 }
 
