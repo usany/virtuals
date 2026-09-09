@@ -42,13 +42,7 @@ resource "azurerm_container_group" "containers" {
       }
     }
 
-    dynamic "environment_variables" {
-      for_each = each.value.environment_vars
-      content {
-        name  = environment_variables.key
-        value = environment_variables.value
-      }
-    }
+    environment_variables = each.value.environment_vars
   }
 
   tags = merge(
