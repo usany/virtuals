@@ -1,0 +1,34 @@
+resource_group_name = "my-resource-group"
+location             = "eastus"
+environment          = "dev"
+acr_name             = "myacrname"
+acr_sku              = "Standard"
+enable_public_ip     = true
+
+common_tags = {
+  Project     = "MyProject"
+  CostCenter  = "Engineering"
+  ManagedBy   = "Terraform"
+}
+
+container_instances = {
+  web = {
+    image   = "nginx:latest"
+    cpu     = 0.5
+    memory  = 1.0
+    ports   = [80, 443]
+    environment_vars = {
+      NGINX_HOST = "example.com"
+    }
+  }
+  api = {
+    image   = "myacr.azurecr.io/api:latest"
+    cpu     = 1.0
+    memory  = 2.0
+    ports   = [3000]
+    environment_vars = {
+      API_ENV = "production"
+      LOG_LEVEL = "info"
+    }
+  }
+}
