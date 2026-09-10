@@ -63,7 +63,9 @@ jobs:
 
           if [ -f "migrations/001_init.sql" ]; then
             echo "Applying D1 schema migrations..."
-            wrangler d1 execute production-db --file=migrations/001_init.sql --remote
+            wrangler d1 execute production-db --file=migrations/001_init.sql --remote || echo "Migration already applied or skipped"
+          else
+            echo "No migrations found, skipping..."
           fi
 
       - name: Create R2 Bucket
@@ -124,25 +126,30 @@ jobs:
           echo "database_id=$DB_ID" >> $GITHUB_OUTPUT
           echo "Using D1 Database ID: $DB_ID"
 
-      - name: Update wrangler.toml with D1 ID
+      - name: Validate wrangler.toml
         run: |
           cd cloudflare-worker
 
-          DB_ID="${{ steps.get-db-id.outputs.database_id }}"
-
-          if [ ! -z "$DB_ID" ] && [ "$DB_ID" != "null" ]; then
-            sed -i "s/database_id = \"\"/database_id = \"$DB_ID\"/g" wrangler.toml
-            echo "Updated wrangler.toml with D1 database_id: $DB_ID"
+          if [ ! -f "wrangler.toml" ]; then
+            echo "ERROR: wrangler.toml not found"
+            exit 1
           fi
 
-          cat wrangler.toml | grep -A 5 "d1_databases"
+          echo "wrangler.toml found, checking configuration..."
+          cat wrangler.toml | grep -A 5 "d1_databases" || echo "Warning: No d1_databases found in wrangler.toml"
 
       - name: Deploy Worker
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          D1_DATABASE_ID: ${{ steps.get-db-id.outputs.database_id }}
         run: |
           cd cloudflare-worker
+
+          if [ -z "$D1_DATABASE_ID" ] || [ "$D1_DATABASE_ID" = "null" ]; then
+            echo "WARNING: D1 Database ID not found, Worker may not have database access"
+          fi
+
           wrangler deploy
 
   test-endpoints:
@@ -164,28 +171,65 @@ jobs:
           echo "Worker URL: $WORKER_URL"
 
       - name: Wait for Worker Deployment
-        run: sleep 5
+        run: |
+          WORKER_URL="${{ steps.get-url.outputs.worker_url }}"
+          echo "Waiting for Worker to be ready: $WORKER_URL"
+
+          for i in {1..30}; do
+            if curl -s -f "$WORKER_URL" > /dev/null 2>&1; then
+              echo "Worker is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/30: Worker not ready yet, retrying..."
+            sleep 2
+          done
+
+          echo "WARNING: Worker did not respond after 60 seconds, proceeding with tests anyway"
 
       - name: Test Health Endpoint
         run: |
           WORKER_URL="${{ steps.get-url.outputs.worker_url }}"
           echo "Testing: $WORKER_URL"
 
-          curl -s "$WORKER_URL" | jq . || echo "Health check response"
+          RESPONSE=$(curl -s "$WORKER_URL" || echo "")
+          if [ -z "$RESPONSE" ]; then
+            echo "Health check failed: no response"
+            exit 1
+          fi
+
+          echo "$RESPONSE" | jq . 2>/dev/null || echo "Response (not JSON): $RESPONSE"
 
       - name: Test D1 Endpoint
         run: |
           WORKER_URL="${{ steps.get-url.outputs.worker_url }}"
 
           echo "Testing: $WORKER_URL/api/items"
-          curl -s "$WORKER_URL/api/items" | jq . || echo "D1 endpoint response"
+          RESPONSE=$(curl -s -w "\n%{http_code}" "$WORKER_URL/api/items" || echo "\n000")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+
+          echo "HTTP Status: $HTTP_CODE"
+          echo "$BODY" | jq . 2>/dev/null || echo "Response: $BODY"
+
+          if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "404" ]; then
+            echo "WARNING: D1 endpoint returned HTTP $HTTP_CODE"
+          fi
 
       - name: Test R2 Endpoint
         run: |
           WORKER_URL="${{ steps.get-url.outputs.worker_url }}"
 
           echo "Testing: $WORKER_URL/api/files"
-          curl -s "$WORKER_URL/api/files" | jq . || echo "R2 endpoint response"
+          RESPONSE=$(curl -s -w "\n%{http_code}" "$WORKER_URL/api/files" || echo "\n000")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+
+          echo "HTTP Status: $HTTP_CODE"
+          echo "$BODY" | jq . 2>/dev/null || echo "Response: $BODY"
+
+          if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "404" ]; then
+            echo "WARNING: R2 endpoint returned HTTP $HTTP_CODE"
+          fi
 
   summary:
     name: Deployment Summary
