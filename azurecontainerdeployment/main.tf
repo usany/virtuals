@@ -2,6 +2,12 @@ data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
 
+resource "random_string" "dns_suffix" {
+  length  = 5
+  special = false
+  upper   = false
+}
+
 resource "azurerm_container_registry" "acr" {
   name                = var.acr_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -26,7 +32,7 @@ resource "azurerm_container_group" "containers" {
   location            = data.azurerm_resource_group.rg.location
   os_type             = "Linux"
   ip_address_type     = var.enable_public_ip ? "Public" : "Private"
-  dns_name_label      = var.enable_public_ip ? "${each.key}-${var.environment}" : null
+  dns_name_label      = var.enable_public_ip ? "${each.key}-${var.environment}-${random_string.dns_suffix.result}" : null
 
   container {
     name   = each.key
