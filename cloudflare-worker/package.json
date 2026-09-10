@@ -1,0 +1,25 @@
+{
+  "name": "cloudflare-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker with D1 Database and R2 Storage",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "tsc",
+    "test": "jest",
+    "d1:list": "wrangler d1 list",
+    "d1:create": "wrangler d1 create production-db",
+    "r2:list": "wrangler r2 bucket list",
+    "r2:create": "wrangler r2 bucket create my-uploads"
+  },
+  "dependencies": {
+    "itty-router": "^4.7.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240620.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.28.0"
+  }
+}
