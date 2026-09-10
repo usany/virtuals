@@ -2,8 +2,19 @@ data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
 
+data "azurerm_container_registry" "remake" {
+  name                = "remake"
+  resource_group_name = "DefaultResourceGroup-SE"
+}
+
+resource "random_string" "dns_suffix" {
+  length  = 5
+  special = false
+  upper   = false
+}
+
 resource "azurerm_container_registry" "acr" {
-  name                = var.acr_name
+  name                = "remakeacr1001"
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   sku                 = var.acr_sku
@@ -26,7 +37,13 @@ resource "azurerm_container_group" "containers" {
   location            = data.azurerm_resource_group.rg.location
   os_type             = "Linux"
   ip_address_type     = var.enable_public_ip ? "Public" : "Private"
-  dns_name_label      = var.enable_public_ip ? "${each.key}-${var.environment}" : null
+  dns_name_label      = var.enable_public_ip ? "${each.key}-${var.environment}-${random_string.dns_suffix.result}" : null
+
+  image_registry_credential {
+    server   = data.azurerm_container_registry.remake.login_server
+    username = data.azurerm_container_registry.remake.admin_username
+    password = data.azurerm_container_registry.remake.admin_password
+  }
 
   container {
     name   = each.key
